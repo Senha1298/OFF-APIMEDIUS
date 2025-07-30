@@ -1183,7 +1183,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             const regularizeButton = document.querySelector('.regularize-button');
             if (regularizeButton) {
-                regularizeButton.addEventListener('click', generatePayment);
+                regularizeButton.addEventListener('click', function() {
+                    window.location.href = '/chat';
+                });
             }
             
             // CPF form handling
