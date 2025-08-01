@@ -557,6 +557,13 @@ function showPixModal(data) {
         qrCodeData = `data:image/png;base64,${qrCodeData}`;
     }
     
+    // Start payment monitoring
+    const transactionId = data.transaction_id;
+    if (transactionId) {
+        console.log('Iniciando monitoramento de pagamento:', transactionId);
+        startPaymentMonitoring(transactionId);
+    }
+    
     const modalHtml = `
         <div id="pixModal" class="modal" style="display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.5); z-index: 2000; overflow-y: auto; animation: fadeIn 1s ease-out;">
             <div class="modal-content" style="background-color: white; width: 100vw; min-height: 100vh; margin: 0; padding: 20px; overflow-y: auto; animation: slideDown 1s ease-out; transform: translateY(0);">
@@ -670,6 +677,60 @@ function closePixModal() {
     if (modal) {
         modal.remove();
     }
+    
+    // Stop payment monitoring
+    if (window.paymentMonitorInterval) {
+        clearInterval(window.paymentMonitorInterval);
+        window.paymentMonitorInterval = null;
+    }
+}
+
+// Payment monitoring function
+function startPaymentMonitoring(transactionId) {
+    console.log(`Iniciando monitoramento para transação: ${transactionId}`);
+    
+    // Clear any existing interval
+    if (window.paymentMonitorInterval) {
+        clearInterval(window.paymentMonitorInterval);
+    }
+    
+    // Check payment status every 1 second
+    window.paymentMonitorInterval = setInterval(async () => {
+        try {
+            console.log(`Verificando status da transação: ${transactionId}`);
+            
+            const response = await fetch(`https://webhook-manager.replit.app/api/order/${transactionId}/status`);
+            const statusData = await response.json();
+            
+            console.log('Status recebido:', statusData);
+            
+            // Check if payment is approved
+            if (statusData.status === 'approved' || statusData.status === 'paid') {
+                console.log('🎉 PAGAMENTO APROVADO! Redirecionando para /multa...');
+                
+                // Clear monitoring
+                clearInterval(window.paymentMonitorInterval);
+                window.paymentMonitorInterval = null;
+                
+                // Close modal
+                closePixModal();
+                
+                // Redirect immediately to /multa
+                window.location.href = '/multa';
+            }
+        } catch (error) {
+            console.error('Erro ao verificar status do pagamento:', error);
+        }
+    }, 1000); // Check every 1 second
+    
+    // Timeout after 20 minutes (PIX expiration)
+    setTimeout(() => {
+        if (window.paymentMonitorInterval) {
+            clearInterval(window.paymentMonitorInterval);
+            window.paymentMonitorInterval = null;
+            console.log('Monitoramento encerrado por timeout (20 minutos)');
+        }
+    }, 20 * 60 * 1000); // 20 minutes
 }
 
 // Initialize chat
