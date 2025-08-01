@@ -558,7 +558,7 @@ function showPixModal(data) {
     }
     
     // Start payment monitoring
-    const transactionId = data.transaction_id || data.order_id;
+    const transactionId = data.transaction_id || data.orderId || data.order_id;
     console.log('🔍 Dados PIX recebidos:', data);
     console.log('🆔 Transaction ID identificado:', transactionId);
     if (transactionId) {
