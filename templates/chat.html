@@ -566,7 +566,9 @@ function showPixModal(data) {
         startPaymentMonitoring(transactionId);
         
         // Show manual confirmation popup after 20 seconds
+        console.log('⏰ Configurando popup de confirmação para aparecer em 20 segundos...');
         setTimeout(() => {
+            console.log('⏰ 20 segundos passaram, chamando showManualPaymentConfirmation...');
             showManualPaymentConfirmation(transactionId);
         }, 20000);
     } else {
@@ -784,6 +786,12 @@ document.addEventListener('DOMContentLoaded', initializeChat);
 function testPaymentMonitoring() {
     console.log('🧪 Testando monitoramento de pagamento com nova API...');
     startPaymentMonitoring('7228484a-95fe-42d3-b537-b97834b1f5aa');
+}
+
+// Test function for manual confirmation popup
+function testPopup() {
+    console.log('🧪 Testando popup de confirmação...');
+    showManualPaymentConfirmation('test-transaction-id');
 }
 
 // Function to show manual payment confirmation popup
