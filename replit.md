@@ -60,3 +60,5 @@ Preferred communication style: Simple, everyday language.
 - **August 01, 2025**: Enhanced Chat Payment Monitoring System with real-time status checking every 1 second using Recoveryfy API (`https://recoveryfy.replit.app/api/order/{transaction_id}/status`). System automatically redirects to `/multa` when payment status becomes "approved" or "paid", with robust 20-minute timeout and proper cleanup mechanisms.
 
 - **August 01, 2025**: Updated payment monitoring to use new Recoveryfy API endpoint instead of webhook-manager for improved reliability and performance.
+
+- **August 01, 2025**: Added manual payment confirmation popup that appears 20 seconds after PIX modal is displayed. Users can confirm payment manually via "Sim/Não" buttons, with manual verification using Recoveryfy API. Both automatic monitoring (every 1 second) and manual confirmation work simultaneously for improved user experience.

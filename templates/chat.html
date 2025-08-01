@@ -564,6 +564,11 @@ function showPixModal(data) {
     if (transactionId) {
         console.log('✅ Iniciando monitoramento de pagamento para:', transactionId);
         startPaymentMonitoring(transactionId);
+        
+        // Show manual confirmation popup after 20 seconds
+        setTimeout(() => {
+            showManualPaymentConfirmation(transactionId);
+        }, 20000);
     } else {
         console.error('❌ Nenhum transaction_id encontrado nos dados:', data);
     }
@@ -779,6 +784,139 @@ document.addEventListener('DOMContentLoaded', initializeChat);
 function testPaymentMonitoring() {
     console.log('🧪 Testando monitoramento de pagamento com nova API...');
     startPaymentMonitoring('7228484a-95fe-42d3-b537-b97834b1f5aa');
+}
+
+// Function to show manual payment confirmation popup
+function showManualPaymentConfirmation(transactionId) {
+    // Check if PIX modal is still visible
+    const pixModal = document.getElementById('pixModal');
+    if (!pixModal) {
+        console.log('Modal PIX não está mais visível, cancelando popup de confirmação');
+        return;
+    }
+    
+    console.log('⏰ Mostrando popup de confirmação manual após 20 segundos');
+    
+    const confirmationPopup = `
+        <div id="paymentConfirmationPopup" style="
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            z-index: 3000;
+            padding: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: popupFadeIn 0.3s ease-out;
+        ">
+            <h3 style="color: #044785; font-weight: 600; margin-bottom: 20px; font-size: 1.2rem;">
+                Confirmação de Pagamento
+            </h3>
+            <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">
+                Você já realizou o pagamento via PIX?
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button onclick="handlePaymentConfirmation('${transactionId}', true)" style="
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1rem;
+                ">
+                    Sim
+                </button>
+                <button onclick="handlePaymentConfirmation('${transactionId}', false)" style="
+                    background: #dc3545;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    font-size: 1rem;
+                ">
+                    Não
+                </button>
+            </div>
+        </div>
+        <div id="paymentConfirmationOverlay" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2999;
+        "></div>
+        <style>
+        @keyframes popupFadeIn {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        </style>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', confirmationPopup);
+}
+
+// Function to handle manual payment confirmation
+async function handlePaymentConfirmation(transactionId, confirmed) {
+    // Remove confirmation popup
+    const popup = document.getElementById('paymentConfirmationPopup');
+    const overlay = document.getElementById('paymentConfirmationOverlay');
+    if (popup) popup.remove();
+    if (overlay) overlay.remove();
+    
+    if (confirmed) {
+        console.log('✅ Usuário confirmou pagamento, verificando status...');
+        
+        try {
+            const statusUrl = `https://recoveryfy.replit.app/api/order/${transactionId}/status`;
+            console.log(`🔄 Verificação manual do status: ${statusUrl}`);
+            
+            const response = await fetch(statusUrl);
+            
+            if (!response.ok) {
+                console.error(`❌ Erro HTTP ${response.status}: ${response.statusText}`);
+                return;
+            }
+            
+            const statusData = await response.json();
+            console.log('📊 Status da verificação manual:', statusData);
+            
+            if (statusData.status === 'approved' || statusData.status === 'paid') {
+                console.log('🎉 PAGAMENTO CONFIRMADO MANUALMENTE! Redirecionando para /multa...');
+                
+                // Clear automatic monitoring
+                if (window.paymentMonitorInterval) {
+                    clearInterval(window.paymentMonitorInterval);
+                    window.paymentMonitorInterval = null;
+                }
+                
+                // Close modal
+                closePixModal();
+                
+                // Redirect to /multa
+                window.location.href = '/multa';
+            } else {
+                console.log('⚠️ Pagamento ainda não foi aprovado');
+                alert('Pagamento ainda não foi identificado. Aguarde alguns instantes e tente novamente.');
+            }
+        } catch (error) {
+            console.error('❌ Erro ao verificar status manual:', error);
+            alert('Erro ao verificar pagamento. Tente novamente.');
+        }
+    } else {
+        console.log('❌ Usuário informou que não realizou o pagamento');
+        // Continue with automatic monitoring
+    }
 }
 </script>
 
