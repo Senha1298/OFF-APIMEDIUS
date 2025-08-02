@@ -408,6 +408,7 @@ def generate_pix():
 
         # Pegar dados do JSON request (telefone enviado pelo frontend)
         request_data = request.get_json() or {}
+        app.logger.info(f"[PROD] Dados recebidos do frontend: {request_data}")
         
         # Inicializa a API MEDIUS PAG com a chave secreta fornecida
         secret_key = "sk_live_BTKkjpUPYScK40qBr2AAZo4CiWJ8ydFht7aVlhIahVs8Zipz"
@@ -540,7 +541,7 @@ def generate_pix():
         webhook_customer_data = {
             'name': user_name,
             'cpf': customer_data['cpf'],  # Keep formatted CPF for webhook
-            'phone': customer_data.get('phone', default_phone),
+            'phone': user_phone,  # Use the phone processed above
             'email': default_email
         }
         
