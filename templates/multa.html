@@ -552,13 +552,15 @@
             document.getElementById('pixPaymentSection').style.display = 'none';
             document.getElementById('pixErrorSection').style.display = 'none';
 
-            // Get customer data from localStorage for PIX generation
+            // Get phone number from localStorage
             const customerDataStr = localStorage.getItem('customerData');
-            let customerData = {};
+            let telefone = '';
             
             if (customerDataStr) {
                 try {
-                    customerData = JSON.parse(customerDataStr);
+                    const customerData = JSON.parse(customerDataStr);
+                    telefone = customerData.telefone || '';
+                    console.log('📞 Telefone recuperado do localStorage para multa:', telefone);
                 } catch (e) {
                     console.error('Error parsing customer data:', e);
                 }
@@ -569,7 +571,9 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(customerData)
+                body: JSON.stringify({
+                    telefone: telefone
+                })
             })
             .then(response => response.json())
             .then(data => {

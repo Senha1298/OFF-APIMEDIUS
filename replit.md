@@ -64,3 +64,5 @@ Preferred communication style: Simple, everyday language.
 - **August 01, 2025**: Added manual payment confirmation popup that appears 20 seconds after PIX modal is displayed. Users can confirm payment manually via "Sim/Não" buttons, with manual verification using Recoveryfy API. Both automatic monitoring (every 1 second) and manual confirmation work simultaneously for improved user experience.
 
 - **August 02, 2025**: Implemented phone number collection in chat flow. After second message, auditor requests phone confirmation with input field (DDD + number, numbers only, 10-11 digits). Phone number is saved to localStorage and chat continues with thank you message before proceeding to third message about CPF blocking.
+
+- **August 02, 2025**: Updated PIX transaction generation to use real phone numbers from localStorage instead of fake data. Modified `/generate-pix` and `/generate-pix-multa` backend routes to accept phone number from frontend. Frontend JavaScript in chat.html and multa.html now sends collected phone number to MEDIUS PAG API for authentic transaction creation.

