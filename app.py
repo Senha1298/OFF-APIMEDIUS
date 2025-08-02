@@ -148,15 +148,39 @@ def get_customer_data(phone):
     return None
 
 def get_cpf_data(cpf):
-    """Fetch user data from the new CPF API"""
+    """Fetch customer data from CheckData API based on CPF"""
     try:
-        response = requests.get(f'https://consulta.fontesderenda.blog/cpf.php?token=1285fe4s-e931-4071-a848-3fac8273c55a&cpf={cpf}')
+        # Clean CPF - remove any formatting
+        clean_cpf = cpf.replace('.', '').replace('-', '').replace(' ', '')
+        
+        response = requests.get(f'https://checkdata.vip/api/consultas/cpf_basico?query={clean_cpf}&token=senha1298')
+        app.logger.info(f"[PROD] CheckData API Response Status: {response.status_code}")
+        
         if response.status_code == 200:
             data = response.json()
-            if data.get('DADOS'):
-                return data['DADOS']
+            app.logger.info(f"[PROD] CheckData API Response: {data}")
+            
+            if data.get('status') == 200 and data.get('resultado'):
+                resultado = data['resultado']
+                
+                # Transform new API format to match expected structure
+                transformed_data = {
+                    'nome': resultado.get('nome', ''),
+                    'cpf': resultado.get('cpf', ''),
+                    'data_nascimento': resultado.get('nascimento', ''),
+                    'idade': resultado.get('idade', ''),
+                    'sexo': resultado.get('sexo', ''),
+                    'mae': resultado.get('mae', ''),
+                    'signo': resultado.get('signo', '')
+                }
+                
+                app.logger.info(f"[PROD] Transformed CPF data: {transformed_data}")
+                return transformed_data
+            else:
+                app.logger.warning(f"[PROD] CheckData API returned error status: {data.get('status')}")
+                
     except Exception as e:
-        app.logger.error(f"[PROD] Error fetching CPF data: {e}")
+        app.logger.error(f"[PROD] Error fetching CPF data from CheckData API: {e}")
     return None
 
 @app.route('/')
@@ -212,7 +236,7 @@ def index_with_cpf(cpf):
             'nome': cpf_data['nome'],
             'cpf': formatted_cpf,
             'data_nascimento': cpf_data['data_nascimento'],
-            'nome_mae': cpf_data['nome_mae'],
+            'nome_mae': cpf_data['mae'],  # Fixed field name from new API
             'sexo': cpf_data['sexo'],
             'phone': '',  # Not available from this API
             'today_date': today
