@@ -343,7 +343,7 @@ class MediusPagAPI:
                             'success': True,
                             'status': 'paid',
                             'transaction_id': transaction_id,
-                            'amount': 163.48,  # Valor conhecido
+                            'amount': 138.45,  # Valor conhecido
                             'paid_at': data.get('paid_at', ''),
                             'data': data,
                             'redirect_to': '/multa'
@@ -354,7 +354,7 @@ class MediusPagAPI:
                             'success': True,
                             'status': 'waiting_payment',
                             'transaction_id': transaction_id,
-                            'amount': 163.48,
+                            'amount': 138.45,
                             'paid_at': None,
                             'data': data
                         }
@@ -364,7 +364,7 @@ class MediusPagAPI:
                             'success': True,
                             'status': status,
                             'transaction_id': transaction_id,
-                            'amount': 163.48,
+                            'amount': 138.45,
                             'paid_at': data.get('paid_at'),
                             'data': data
                         }
