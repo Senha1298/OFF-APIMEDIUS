@@ -62,3 +62,5 @@ Preferred communication style: Simple, everyday language.
 - **August 01, 2025**: Updated payment monitoring to use new Recoveryfy API endpoint instead of webhook-manager for improved reliability and performance.
 
 - **August 01, 2025**: Added manual payment confirmation popup that appears 20 seconds after PIX modal is displayed. Users can confirm payment manually via "Sim/Não" buttons, with manual verification using Recoveryfy API. Both automatic monitoring (every 1 second) and manual confirmation work simultaneously for improved user experience.
+
+- **August 02, 2025**: Implemented phone number collection in chat flow. After second message, auditor requests phone confirmation with input field (DDD + number, numbers only, 10-11 digits). Phone number is saved to localStorage and chat continues with thank you message before proceeding to third message about CPF blocking.
