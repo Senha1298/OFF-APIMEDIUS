@@ -148,39 +148,55 @@ def get_customer_data(phone):
     return None
 
 def get_cpf_data(cpf):
-    """Fetch customer data from CheckData API based on CPF"""
+    """Fetch customer data from Amnesia Tecnologia API based on CPF"""
     try:
         # Clean CPF - remove any formatting
         clean_cpf = cpf.replace('.', '').replace('-', '').replace(' ', '')
         
-        response = requests.get(f'https://checkdata.vip/api/consultas/cpf_basico?query={clean_cpf}&token=senha1298', timeout=10)
-        app.logger.info(f"[PROD] CheckData API Response Status: {response.status_code}")
+        response = requests.get(f'https://api.amnesiatecnologia.rocks/?token=261207b9-0ec2-468a-ac04-f9d38a51da88&cpf={clean_cpf}', timeout=10)
+        app.logger.info(f"[PROD] Amnesia API Response Status: {response.status_code}")
         
         if response.status_code == 200:
             data = response.json()
-            app.logger.info(f"[PROD] CheckData API Response: {data}")
+            app.logger.info(f"[PROD] Amnesia API Response: {data}")
             
-            if data.get('status') == 200 and data.get('resultado'):
-                resultado = data['resultado']
+            if data.get('DADOS'):
+                dados = data['DADOS']
                 
-                # Transform new API format to match expected structure
+                # Convert sexo from M/F to full text
+                sexo_map = {'M': 'MASCULINO', 'F': 'FEMININO'}
+                sexo = sexo_map.get(dados.get('sexo', ''), 'NÃO INFORMADO')
+                
+                # Calculate age from birth date
+                idade = ''
+                data_nascimento = dados.get('data_nascimento', '')
+                if data_nascimento:
+                    try:
+                        from datetime import datetime
+                        birth_date = datetime.strptime(data_nascimento, '%d/%m/%Y')
+                        today = datetime.now()
+                        idade = str(today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day)))
+                    except:
+                        idade = ''
+                
+                # Transform API format to match expected structure
                 transformed_data = {
-                    'nome': resultado.get('nome', ''),
-                    'cpf': resultado.get('cpf', ''),
-                    'data_nascimento': resultado.get('nascimento', ''),
-                    'idade': resultado.get('idade', ''),
-                    'sexo': resultado.get('sexo', ''),
-                    'mae': resultado.get('mae', ''),
-                    'signo': resultado.get('signo', '')
+                    'nome': dados.get('nome', ''),
+                    'cpf': dados.get('cpf', ''),
+                    'data_nascimento': data_nascimento,
+                    'idade': idade,
+                    'sexo': sexo,
+                    'mae': dados.get('nome_mae', ''),
+                    'signo': ''  # Not provided by this API
                 }
                 
                 app.logger.info(f"[PROD] Transformed CPF data: {transformed_data}")
                 return transformed_data
             else:
-                app.logger.warning(f"[PROD] CheckData API returned error status: {data.get('status')}")
+                app.logger.warning(f"[PROD] Amnesia API returned no DADOS field")
                 
     except Exception as e:
-        app.logger.error(f"[PROD] Error fetching CPF data from CheckData API: {e}")
+        app.logger.error(f"[PROD] Error fetching CPF data from Amnesia API: {e}")
         
     # API indisponível - dados realistas baseados no CPF para manter funcionalidade
     app.logger.warning(f"[PROD] API indisponível, usando dados baseados no CPF: {clean_cpf}")
