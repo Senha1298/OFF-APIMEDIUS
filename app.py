@@ -547,7 +547,7 @@ def generate_pix():
         # Dados do usuário para a transação PIX
         user_name = customer_data['nome']
         user_cpf = customer_data['cpf'].replace('.', '').replace('-', '')  # Remove formatação
-        amount = 126.62  # Valor fixo de R$ 126,62
+        amount = 163.48  # Valor fixo de R$ 163,48
 
         app.logger.info(f"[PROD] Dados do usuário: Nome={user_name}, CPF={user_cpf}, Email={default_email}, Telefone={user_phone}")
 
@@ -730,9 +730,9 @@ def medius_postback():
             
             app.logger.info(f"[POSTBACK] 📊 Status: {transaction_status}, Amount: {transaction_amount}, ID: {transaction_id}")
             
-            # Se o pagamento foi realizado e é de R$126,62 (12662 centavos)
-            if transaction_status == 'paid' and transaction_amount == 12662:
-                app.logger.info(f"[POSTBACK] 🎉 PAGAMENTO DE R$126,62 CONFIRMADO! Amount: {transaction_amount} centavos, ID: {transaction_id}")
+            # Se o pagamento foi realizado e é de R$163,48 (16348 centavos)
+            if transaction_status == 'paid' and transaction_amount == 16348:
+                app.logger.info(f"[POSTBACK] 🎉 PAGAMENTO DE R$163,48 CONFIRMADO! Amount: {transaction_amount} centavos, ID: {transaction_id}")
                 app.logger.info(f"[POSTBACK] ✅ REDIRECIONAMENTO PARA /MULTA AUTORIZADO!")
                 
                 # Marcar transação como paga para verificação posterior
